@@ -46,6 +46,13 @@ async fn handler(
     mut req: Request<Body>,
 ) -> Response<Body> {
     let path = req.uri().path();
+    if path == "/" {
+        return Response::builder()
+            .status(302)
+            .header("Location", "https://github.com/Xhofe")
+            .body(Body::empty())
+            .unwrap();
+    }
     let path_query = req
         .uri()
         .path_and_query()
@@ -54,12 +61,14 @@ async fn handler(
 
     let uri = format!("{}", &path_query[1..]);
     info!("uri: {}", uri);
-    let req = Request::builder()
-        .method(req.method().clone())
-        .uri(uri)
-        .body(Body::empty())
-        .unwrap();
-    // *req.uri_mut() = Uri::try_from(uri).unwrap();
+
+    *req.uri_mut() = Uri::try_from(uri).unwrap();
+    let has_host = req.headers().contains_key("host");
+    if has_host {
+        req.headers_mut().remove("host");
+        let host = req.uri().host().unwrap_or_default().to_owned();
+        req.headers_mut().insert("host", host.parse().unwrap());
+    }
 
     client.request(req).await.unwrap()
 }
