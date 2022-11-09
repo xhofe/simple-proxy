@@ -26,10 +26,6 @@ jobs:
             os: ubuntu-latest
             cross: false
             file-ext: ""
-          - target: x86_64-unknown-linux-musl
-            os: ubuntu-latest
-            cross: true
-            file-ext: ""
           - target: x86_64-pc-windows-msvc
             os: windows-latest
             cross: false
@@ -42,24 +38,8 @@ jobs:
             os: macos-latest
             cross: false
             file-ext: ""
-          - target: aarch64-unknown-linux-gnu
-            os: ubuntu-latest
-            cross: true
-            file-ext: ""
-          - target: aarch64-unknown-linux-musl
-            os: ubuntu-latest
-            cross: true
-            file-ext: ""
           - target: aarch64-apple-darwin
             os: macos-latest
-            cross: true
-            file-ext: ""
-          - target: arm-unknown-linux-gnueabihf
-            os: ubuntu-latest
-            cross: true
-            file-ext: ""
-          - target: armv7-unknown-linux-musleabihf
-            os: ubuntu-latest
             cross: true
             file-ext: ""
           
@@ -82,15 +62,15 @@ jobs:
         continue-on-error: true
         uses: svenstaro/upx-action@v2
         with:
-          file: target/${{ matrix.target }}/release/simple-proxy${{ matrix.file-ext }}
+          file: target/${{ matrix.target }}/release/simple_proxy${{ matrix.file-ext }}
           args: -q --best --lzma
           strip: false
       - name: pack
         run: |
           mkdir -p release-${{ matrix.target }}
           cd release-${{ matrix.target }}
-          tar -C ../target/${{ matrix.target }}/release -zcf simple-proxy-${{ matrix.target }}.tar.gz simple-proxy${{ matrix.file-ext }}
-          openssl dgst -sha256 -r simple-proxy-${{ matrix.target }}.tar.gz > simple-proxy-${{ matrix.target }}.sha256
+          tar -C ../target/${{ matrix.target }}/release -zcf simple_proxy-${{ matrix.target }}.tar.gz simple_proxy${{ matrix.file-ext }}
+          openssl dgst -sha256 -r simple_proxy-${{ matrix.target }}.tar.gz > simple_proxy-${{ matrix.target }}.sha256
       - name: release
         uses: softprops/action-gh-release@v1
         with:
