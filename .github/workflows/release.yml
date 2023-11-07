@@ -41,4 +41,8 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: goreleaser
-          path: dist
+          path: |
+            dist/*.tar.gz
+            dist/*.json
+            dist/*.yaml
+            dist/*.txt
