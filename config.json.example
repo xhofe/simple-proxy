@@ -1,0 +1,6 @@
+{
+  "proxies": {
+    "/proxy/*splat": ":splat",
+    "/tgp/*splat": "https://telegra.ph/:splat"
+  }
+}
