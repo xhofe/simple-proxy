@@ -8,6 +8,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+var magicQueryKeyPrefix = "_sp_"
+
 var HttpClient = &http.Client{}
 
 func proxiesHandle(app *gin.Engine) {
@@ -28,8 +30,15 @@ func proxy(source string, target string) gin.HandlerFunc {
 				target = strings.Replace(target, ":"+param.Key, param.Value, 1)
 			}
 		}
+		rawQuery := ctx.Request.URL.Query()
 		if ctx.Request.URL.RawQuery != "" {
-			target += "?" + ctx.Request.URL.RawQuery
+			query := ctx.Request.URL.Query()
+			for k, _ := range query {
+				if strings.HasPrefix(k, magicQueryKeyPrefix) {
+					query.Del(k)
+				}
+			}
+			target += "?" + query.Encode()
 		}
 		if !strings.HasPrefix(target, "http") {
 			target = "https://" + target
@@ -47,6 +56,9 @@ func proxy(source string, target string) gin.HandlerFunc {
 		}
 		for h, val := range ctx.Request.Header {
 			req.Header[h] = val
+		}
+		for _, v := range rawQuery[magicQueryKeyPrefix+"del_headers"] {
+			req.Header.Del(v)
 		}
 		res, err := HttpClient.Do(req)
 		if err != nil {
